@@ -8,7 +8,7 @@ import { Request, Response } from "express";
 app.use((req: Request, res: Response, next: any) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "http://localhost:8080"
+    "*"
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
