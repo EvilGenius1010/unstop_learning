@@ -16,6 +16,8 @@ const express = require('express');
 const app = express();
 const port = process.env.port || 3000;
 const prisma_1 = __importDefault(require("./prisma"));
+const axios = require('axios');
+const maps_1 = require("./maps");
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE");
@@ -73,6 +75,66 @@ app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     // res.json({
     //   msg: checkcreds
     // })
+}));
+app.post('/getaccesstoken', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const authcode = "dnsna"
+    //
+    // const gettoken = await axios.post(
+    //   "https://oauth2.googleapis.com/token",
+    //   new URLSearchParams({
+    //     grant_type: "authorization_code",
+    //     authcode,
+    //     client_id: process.env?.CLIENT_ID,
+    //     client_secret: process.env?.CLIENT_SECRET,
+    //     redirect_uri: `your-domain/integrations/gcp-secret-manager/oauth2/callback`,
+    //   })
+    // )
+    //
+    // const access_token = gettoken?.data.access_token; // used to access the Google API
+    // const refresh_token = gettoken?.data.refresh_token; // used to refresh the access token
+    // const expires_in = gettoken?.data.expires_in; // used to know when to refresh the access token
+    var _a;
+    // 2. Construct the data object for request body
+    const data = {
+        grant_type: "authorization_code",
+        code: (_a = req.body) === null || _a === void 0 ? void 0 : _a.authcode, // Use 'code' instead of 'authcode' (common practice)
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        redirect_uri: `your-domain/integrations/gcp-secret-manager/oauth2/callback`,
+    };
+    // 3. Use data object with axios.post
+    try {
+        const gettoken = yield axios.post("https://oauth2.googleapis.com/token", data);
+        const access_token = gettoken === null || gettoken === void 0 ? void 0 : gettoken.data.access_token;
+        const refresh_token = gettoken === null || gettoken === void 0 ? void 0 : gettoken.data.refresh_token;
+        const expires_in = gettoken === null || gettoken === void 0 ? void 0 : gettoken.data.expires_in;
+        // Use the access token and handle expires_in for refresh token logic
+        res.json({ message: 'Access token retrieved' }); // Or send required data
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to get access token' });
+    }
+}));
+app.post("/getnewaccesstoken", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const refresh_token = (_a = req.body) === null || _a === void 0 ? void 0 : _a.refresh_token;
+    const data = {
+        client_id: process.env.GCP_CLIENT_ID,
+        client_secret: process.env.GCP_CLIENT_SECRET,
+        refresh_token,
+        grant_type: "refresh_token",
+    };
+    const getnewaccesstoken = yield axios.post("https://oauth2.googleapis.com/token", data);
+    const access_token = getnewaccesstoken.data.access_token;
+    const expires_in = getnewaccesstoken.data.expires_in;
+}));
+app.post("/testmapsroutes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const abc = yield (0, maps_1.computeRoutes)(req.body.origin, req.body.destination);
+    console.log(abc);
+    res.json({
+        msg: abc
+    });
 }));
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
