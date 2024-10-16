@@ -156,9 +156,9 @@ app.post("/getnewaccesstoken", async (req: Request, res: Response) => {
 
 app.post("/testmapsroutes", async (req: Request, res: Response) => {
   const abc = await computeRoutes(req.body.origin, req.body.destination)
-  console.log(abc)
+  console.log(abc.data)
   res.json({
-    msg: abc
+    msg: abc.data
   })
 })
 
