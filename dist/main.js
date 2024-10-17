@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 const prisma_1 = __importDefault(require("./prisma"));
 const axios = require('axios');
 const maps_1 = require("./maps");
@@ -131,7 +131,7 @@ app.post("/getnewaccesstoken", (req, res) => __awaiter(void 0, void 0, void 0, f
 }));
 app.post("/testmapsroutes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const abc = yield (0, maps_1.computeRoutes)(req.body.origin, req.body.destination);
-    console.log(abc);
+    console.log(abc.data);
     res.json({
         msg: abc
     });

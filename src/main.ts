@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 3000
 import { Request, Response } from "express";
 import prisma from "./prisma";
 const axios = require('axios')
@@ -158,7 +158,7 @@ app.post("/testmapsroutes", async (req: Request, res: Response) => {
   const abc = await computeRoutes(req.body.origin, req.body.destination)
   console.log(abc.data)
   res.json({
-    msg: abc.data
+    msg: abc
   })
 })
 
